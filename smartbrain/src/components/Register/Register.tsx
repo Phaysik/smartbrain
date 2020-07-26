@@ -25,7 +25,7 @@ const Register = ({
 			.then((res) => {
 				const user = res.data;
 
-				if (user) {
+				if (user.id) {
 					createUser(user);
 					onRouteChange('home');
 				}
@@ -82,7 +82,7 @@ const Register = ({
 								/>
 							</div>
 						</fieldset>
-						<div className="">
+						<div>
 							<input
 								onClick={onRegister}
 								className="b ph3 pv2 input-reset ba b--black bg-transparent grow pointer f6 dib"

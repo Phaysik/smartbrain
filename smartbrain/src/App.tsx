@@ -5,15 +5,10 @@ import Logo from './components/Logo/Logo';
 import ImageLinkForm from './components/ImageLinkForm/ImageLinkForm';
 import Rank from './components/Rank/Rank';
 import Particles from 'react-particles-js';
-import Clarifai from 'clarifai';
 import FaceRecognition from './components/FaceRecognition/FaceRecognition';
 import SignIn from './components/SignIn/SignIn';
 import Register from './components/Register/Register';
 import axios from 'axios';
-
-const app = new Clarifai.App({
-	apiKey: '557ccc63e44f4c5fb86574df24263277',
-});
 
 const particleOptions: object = {
 	particles: {
@@ -59,8 +54,10 @@ const App = () => {
 	};
 
 	const onPictureSubmit = () => {
-		app.models
-			.predict(Clarifai.FACE_DETECT_MODEL, imageUrl)
+		axios
+			.post('http://localhost:3000/imageurl', {
+				imageUrl: imageUrl,
+			})
 			.then((response: any) => {
 				if (response) {
 					axios
@@ -70,18 +67,27 @@ const App = () => {
 						.then((response) =>
 							setUser((user: React.SetStateAction<object>) => ({
 								...user,
-								entries: response.data.entries,
+								entries: response.data,
 							}))
-						);
-					setBoundingBox(calculateFaceLocation(response));
+						)
+						.catch(console.log);
+
+					setBoundingBox(calculateFaceLocation(response.data));
 				}
 			})
 			.catch(console.log);
 	};
 
+	const defaultState = (): void => {
+		setIsSignedIn(false);
+		setImageUrl('');
+		setBoundingBox({});
+		setUser(defaultUser);
+	};
+
 	const onRouteChange = (query: React.SetStateAction<string>) => {
 		if (query === 'signout') {
-			setIsSignedIn(false);
+			defaultState();
 		} else if (query === 'home') {
 			setIsSignedIn(true);
 		}
